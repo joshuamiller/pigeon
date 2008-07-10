@@ -1,0 +1,35 @@
+Say you put together a nice site in staticmatic, and now the customer 
+wants to be able to add news updates.  You could set up a blog, or 
+you could configure a CMS, but all you want to do is add new entries 
+and show them on the page.  Pigeon uses the haml layout you already 
+wrote and a small one-file Camping app to add and display news items.
+
+Requires:
+
+Camping 2.0 < http://github.com/why/camping/tree/master >
+Haml < http://haml.hamptoncatlin.com >
+
+Useful with:
+
+Staticmatic < http://staticmatic.rubyforge.org/ >
+
+To install:
+
+Copy your layout into layout.haml, with a yield where you want 
+the content to go.  In pigeon.rb, add your usernames and passwords 
+to SetupUsers.  Run camping pigeon.rb to start it up, or point 
+Rack or FastCGI at it.
+
+TODO:
+
+Lots, this release is just to get things started.  This is not 
+yet a drop-in replacement for a real application.
+
+- Pagination
+- User management
+- Rack/FastCGI setup inclusion
+- ???
+
+
+
+Pigeon: Easier than theming WordPress.
