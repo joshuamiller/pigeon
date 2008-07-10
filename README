@@ -20,6 +20,9 @@ the content to go.  In pigeon.rb, add your usernames and passwords
 to SetupUsers.  Run camping pigeon.rb to start it up, or point 
 Rack or FastCGI at it.
 
+For security's sake, you should also change the state_secret and 
+the salt for passwords.
+
 TODO:
 
 Lots, this release is just to get things started.  This is not 

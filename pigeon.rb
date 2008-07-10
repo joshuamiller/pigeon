@@ -4,7 +4,10 @@ require 'haml'
 
 Camping.goes :Pigeon
 
-module Pigeon; include Camping::Session; end
+module Pigeon 
+  include Camping::Session
+  def state_secret; "microblogical"; end
+end
 
 def Pigeon.create
   Pigeon::Models.create_schema
