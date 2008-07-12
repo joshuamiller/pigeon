@@ -1,12 +1,14 @@
 require 'camping'
 require 'camping/session'
 require 'haml'
+require 'digest/sha1'
 
 Camping.goes :Pigeon
 
 module Pigeon 
   include Camping::Session
   def state_secret; "microblogical"; end
+  def posts_per_page; 5; end
 end
 
 def Pigeon.create
@@ -68,7 +70,10 @@ end
 module Pigeon::Controllers
   class Index < R '/'
     def get
-      @posts = Post.find :all
+      @page = @input['page'] ? @input['page'].to_i : 1
+      @posts = Post.find(:all, :limit => posts_per_page, :offset => ((@page - 1) * posts_per_page), :order => "created_at DESC")
+      @previous_page = (@page == 1) ? nil : @page - 1
+      @next_page = (Post.count - (@page * posts_per_page)) > 0 ? @page + 1 : nil
       @user = @state.user
       render :index
     end
@@ -133,41 +138,47 @@ module Pigeon::Views
   end
 
   def index
+    if @user
+      h2 "Administer Site"
+      h3 { a "New Post", :href => R(New) } 
+      h3 { a "Log Out", :href => R(Logout) }
+    end
     for post in @posts
       h2 post.title
-      h3 post.created_at
+      h3 "Posted #{post.created_at.strftime("%A %B %d, %Y")}"
       p post.body
-      (a "Delete Post", :href => R(Delete, post.id)) if @user
+      p { (a "Delete Post", :href => R(Delete, post.id)) } if @user
     end
-    if @user
-      a "New Post", :href => R(New)
-      a "Log Out", :href => R(Logout)
-    else
+    p { a "Previous Page", :href => "/?page=#{@previous_page}" } if @previous_page
+    p { a "Next Page", :href => "/?page=#{@next_page}" } if @next_page
+    unless @user
       a "Log In Admin", :href => R(Login)
     end
   end
 
   def new
+    h1 "Create New Post"
     form :action => 'create', :method => 'post' do
       p do
         label "Title", :for => 'title'
-        input :name => 'title', :type => 'text'
+        input :name => 'title', :type => 'text', :size => 30
       end
       p do
         label "Body", :for => 'body'
-        input :name => 'body', :type => 'textarea'
+        textarea :name => 'body', :rows => 15, :cols => 50
       end
-      p do input :type => 'submit' end
+      p do input :type => 'submit', :value => 'Submit' end
     end
   end
 
   def show
-    h1 @post.title
+    h2 @post.title
+    h3 "Posted #{post.created_at.strftime("%A %B %d, %Y")}"
     p @post.body
   end
 
   def login
-    h1 @user
+    h3 "Please Log In"
     form :action => 'login', :method => 'post' do
       p do
         label "Username", :for => 'username'
